@@ -1,11 +1,36 @@
 const NavBar = ({stockItems, minStock}) => {
-  const updatedList = stockItems.map((item, index) => {
-    if (item.instock >= minStock) { 
-      return <li key={index}>{item.name}</li>;
-    }
+  const [cart, setCart] = React.useState([]);
+  const [stock, setStock] = React.useState(stockItems);
+  const {Button} = ReactBootstrap;
+
+  const moveToCart = e => {
+    let [name, number] = e.target.innerHTML.split(':');
+    let newStock = stock.map(item => {
+      if (item.name == name && item.instock > minStock) {
+        item.instock --;
+        cart.push(item.name);
+      }
+      return item;
+    });
+    setCart(cart);
+    setStock(newStock);
+  }
+
+  const updatedList = stock.map((item, index) => {
+      return <Button key={index} onClick={moveToCart}>{item.name}:{item.instock}</Button>;
   });
 
-  return <ul style={{listStyleType: "none"}}>{updatedList}</ul>;
+  const updatedCart = cart.map((item, index) => {
+      return <Button key={index}>{item}</Button>;
+  });
+
+  return (
+    <>
+      <ul style={{listStyleType: "none"}}>{updatedList}</ul>
+      <h1>Shopping Cart</h1>
+      <ul style={{listStyleType: "none"}}>{updatedCart}</ul>
+    </>
+  );
 }
 
 const menuItems = [
@@ -17,6 +42,6 @@ const menuItems = [
 ];
 
 ReactDOM.render(
-  <NavBar stockItems={menuItems} minStock={2} />,
+  <NavBar stockItems={menuItems} minStock={0} />,
   document.getElementById("root")
 );
